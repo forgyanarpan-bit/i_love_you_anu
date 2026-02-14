@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Valentine 💘</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Poppins&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+<style>
+body{
+  margin:0;
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#6d5a56;
+  font-family:Poppins;
+  overflow:hidden;
+}
+
+.card{
+  background:#fff;
+  padding:40px;
+  border-radius:30px;
+  width:360px;
+  text-align:center;
+}
+
+h2{
+  font-family:"Playfair Display";
+  color:#4a1c2f;
+}
+
+.buttons{
+  position:relative;
+  height:90px;
+}
+
+button{
+  padding:14px 32px;
+  border-radius:40px;
+  border:none;
+  font-size:16px;
+  cursor:pointer;
+}
+
+#yes{
+  background:#ff4d6d;
+  color:white;
+  position:absolute;
+  left:20px;
+}
+
+#no{
+  background:#eee;
+  color:#666;
+  position:absolute;
+  right:20px;
+}
+
+/* POPUP */
+.popup{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.7);
+  backdrop-filter:blur(6px);
+  align-items:center;
+  justify-content:center;
+  z-index:999;
+}
+
+.popup-box{
+  background:white;
+  padding:30px;
+  border-radius:25px;
+  width:90%;
+  max-width:380px;
+  text-align:center;
+}
+
+/* IMAGE */
+.story-img{
+  width:100%;
+  height:auto;
+  max-height:70vh;
+  object-fit:contain;
+  border-radius:18px;
+  margin:15px 0;
+  background:#f3f3f3;
+}
+
+/* NEXT */
+.heart-wrap{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  cursor:pointer;
+}
+
+.point{
+  font-size:26px;
+  animation:point 1s infinite;
+}
+
+@keyframes point{
+  0%,100%{transform:translateX(0)}
+  50%{transform:translateX(8px)}
+}
+
+.heart{
+  font-size:32px;
+}
+
+/* FINAL */
+.final-buttons{
+  position:relative;
+  height:90px;
+  margin-top:15px;
+}
+
+.final-yes{
+  background:#ff4d6d;
+  color:white;
+  position:absolute;
+  left:20px;
+  padding:14px 32px;
+  border-radius:40px;
+}
+
+.final-no{
+  background:#eee;
+  color:#666;
+  position:absolute;
+  right:20px;
+}
+
+/* TYPING */
+#typingScreen{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:#000;
+  color:white;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  z-index:9999;
+}
+
+#typing{
+  font-size:20px;
+  line-height:1.6;
+  max-width:90%;
+}
+</style>
+</head>
+
+<body>
+
+<!-- MUSIC -->
+<audio id="bgMusic" src="bg.mp3" loop preload="auto"></audio>
+
+<div class="card">
+  <h2>ANANYA,<br>will you be my Valentine?</h2>
+  <div class="buttons">
+    <button id="yes">Yes 💖</button>
+    <button id="no">No 🙈</button>
+  </div>
+</div>
+
+<!-- STORY -->
+<div class="popup" id="popup">
+  <div class="popup-box">
+
+    <h2 id="msg"></h2>
+    <img id="img" class="story-img">
+
+    <div class="heart-wrap" id="next">
+      <div class="point">👉🏼</div>
+      <div class="heart">💗</div>
+    </div>
+
+    <!-- FINAL PAGE -->
+    <div id="final" style="display:none">
+      <p id="finalText">
+        I don’t need a special day,<br>
+        But today feels perfect.<br>
+        Will you be my Valentine? 💌
+      </p>
+
+      <img src="photo5.jpg" class="story-img">
+
+      <div class="final-buttons">
+        <button class="final-yes" id="fYes">Yes 💖</button>
+        <button class="final-no" id="fNo">No</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- TYPING -->
+<div id="typingScreen">
+  <div id="typing"></div>
+</div>
+
+<script>
+/* MUSIC */
+const bgMusic=document.getElementById("bgMusic");
+
+/* FIRST PAGE NO */
+const noTexts=[
+"No 🙈","Sorry 😔","Sorry baby 🥺","Please baby 🙏",
+"Don’t do like this 😣","Please click yes 💖",
+"Plzzz 😭","Plzzz baby 🥹","I am sorry 😞",
+"You have to click YES 😤"
+];
+let noCount=0;
+document.getElementById("no").onclick=()=>{
+  const b=document.getElementById("no");
+  b.textContent=noTexts[Math.min(noCount,noTexts.length-1)];
+  b.style.transform=`translate(${Math.random()*160-80}px,${Math.random()*160-80}px)`;
+  noCount++;
+};
+
+/* UPDATED STORY TEXTS */
+const msgs=[
+"From the first moment, you felt different.\nThis smile… this us…\nIt all started here ❤️",
+"You make my happiest days brighter,\nAnd my hardest days softer.\nJust by being you.",
+"You are my calm in chaos.\nMy safe place,\nMy favorite person 🫶",
+"Thank you for being you.\nFor choosing me,\nFor loving me 💗"
+];
+
+const imgs=["photo1.jpg","photo2.jpg","photo3.jpg","photo4.jpg"];
+
+let i=0;
+const popup=document.getElementById("popup");
+const msg=document.getElementById("msg");
+const img=document.getElementById("img");
+const next=document.getElementById("next");
+const final=document.getElementById("final");
+
+/* START STORY */
+document.getElementById("yes").addEventListener("click",()=>{
+  bgMusic.volume=0.6;
+  bgMusic.play().catch(()=>{});
+  popup.style.display="flex";
+  showStory();
+},{once:true});
+
+function showStory(){
+  msg.innerHTML=msgs[i].replace(/\n/g,"<br>");
+  img.src=imgs[i];
+}
+
+next.onclick=()=>{
+  i++;
+  if(i<imgs.length){
+    showStory();
+  }else{
+    next.style.display="none";
+    msg.style.display="none";
+    img.style.display="none";
+    final.style.display="block";
+  }
+};
+
+/* FINAL NO → YES GROWS (TEXT FIXED) */
+let finalNoCount=0;
+const fYes=document.getElementById("fYes");
+const fNo=document.getElementById("fNo");
+
+fNo.onclick=()=>{
+  finalNoCount++;
+  fYes.style.transform=`scale(${1+finalNoCount*0.25})`;
+  fNo.style.transform=`translate(${Math.random()*140-70}px,${Math.random()*140-70}px)`;
+
+  if(finalNoCount>=11){
+    fYes.style.position="fixed";
+    fYes.style.inset="0";
+    fYes.style.borderRadius="0";
+    fYes.style.fontSize="36px";
+    fYes.style.zIndex="9999";
+    fNo.style.display="none";
+  }
+};
+
+/* FINAL YES → TYPING + REDIRECT */
+const typingScreen=document.getElementById("typingScreen");
+const typing=document.getElementById("typing");
+
+const lines=[
+"I love you ❤️",
+"Since you chose yes, I have something special for you ✨",
+"This is one of my favourite songs.\nEvery time I listen to this, I think about you 💕\nI want you to listen to this song.",
+"Are you ready? 😌🎶",
+"3...","2...","1..."
+];
+
+let line=0,char=0;
+
+fYes.onclick=()=>{
+  bgMusic.pause();
+  bgMusic.currentTime=0;
+  popup.style.display="none";
+  typingScreen.style.display="flex";
+  type();
+};
+
+function type(){
+  if(char<lines[line].length){
+    typing.innerHTML+=lines[line].charAt(char++);
+    setTimeout(type,50);
+  }else{
+    setTimeout(()=>{
+      typing.innerHTML="";
+      char=0;
+      line++;
+      if(line<lines.length){
+        type();
+      }else{
+        window.location.href="https://youtu.be/BTRVFZVZTP8?si=wzIH1vN9-ho1O32h";
+      }
+    },1200);
+  }
+}
+</script>
+
+</body>
+</html>
